@@ -1,68 +1,119 @@
 # Banking Risk Analysis Dashboard
-## Project Overview
+This repository contains a Power BI dashboard designed to help financial institutions with risk analytics in banking and financial services. The solution provides a data-driven approach to minimize the risk of losing money on loans by analyzing applicant data and assessing their likelihood of repayment.
 
-This project provides a **Power BI dashboard** designed for the banking and financial services sector to help minimize the risk of financial loss from lending money. By leveraging data visualization and analytics, the dashboards enable informed decision-making based on an applicant's profile, helping to determine the likelihood of loan repayment.
+## Key Performance Indicators (KPIs)
+The following KPIs are tracked to provide a comprehensive overview of banking metrics:
 
-## Key Features
+- **Total Clients:** A count of all clients in the banking system.
 
-- **Risk Analytics:** The dashboard helps banks develop a fundamental understanding of risk analytics by showing how data can be used to mitigate the risk of losing money on loans.
+- **Total Loan:** The combined value of all bank loans, business lending, and credit card balances.
 
-- **Data-Driven Decisions:** With a comprehensive view of client data, banks can make data-driven decisions on whether to approve a loan based on an applicant's profile.
+- **Total Deposit:** The sum of all deposits across various account types.
 
-- **KPIs:** The solution includes several key performance indicators (KPIs) to track crucial metrics, such as ```Total Clients```, ```Total Loan```, ```Total Deposit```, and ```Total Fees```.
+- **Total Fees:** The total amount of fees charged by the bank.
 
-- **Data Cleaning and Transformation:** The project includes calculated columns to clean and transform the raw data into more useful formats, such as categorizing clients by ```Engagement Timeframe``` and ```Income Band```.
+- **Engagement Account:** The total length of client engagement with the bank, measured in days.
+
+- **Bank Loan, Business Lending, Credit Cards Balance:** Individual metrics for each loan category.
+
+- **Bank Deposit, Savings Account Amount, Checking Account Amount, Foreign Currency Amount:** Individual metrics for each deposit category.
+
+## Visualizations and Analysis
+The project includes several dashboards for detailed analysis:
+
+- **Home Dashboard:** A high-level summary of all major KPIs.
+
+- **Loan Analysis Dashboard:** Provides a detailed breakdown of loan data by banking relationship, income band, and nationality.
+
+- **Deposit Analysis Dashboard:** Offers insights into deposit data, categorized by banking relationship, income band, and nationality.
+
+- **Summary Dashboard:** A consolidated view of all key metrics for easy monitoring.
 
 ## Dataset
-
-The dataset contains various tables linked by primary and foreign keys, including:
-
--  ```Banking Relationship```
-
-- ```Client-Banking ```
-
-- ```Gender``` 
-
-- ```Investment Advisor``` 
-
-- ```Period```
-
-## Calculated Measures (DAX)
-
-The following calculated measures were created using Data Analysis Expressions (DAX) in Power BI:
-
-- **Total Clients:** ```DISTINCTCOUNT('Clients - Banking'[Client ID] )``` 
-
-- **Total Fees:** ```SUMX('Clients - Banking' , [Total Loan] * 'Clients - Banking'[Processing Fees] )``` 
-
-- **Engagement Days:** ```DATEDIFF('Clients - Banking'[Joined Bank], TODAY(), DAY )```
-
-- **Total Loan:** ```[Bank Loan] + [Business Lending] + [Credit Cards Balance]``` 
-
-- **Total Deposit:** ```[Bank Deposit] + [Savings Account] + [Foreign Currency Account] + [Checking Accounts]``` 
-
-- **Total CC Amount:** ```SUM('Clients - Banking'[Amount of Credit Cards] )```  
-
-- **Engagement Length:** ```SUM('Clients - Banking'[Engagment Days])``` 
-
- ## Dashboards and Visualizations
- 
-The project features multiple dashboards for a comprehensive analysis of banking data:
-
-- **Home:** A high-level overview of key metrics. 
-
-- **Loan Analysis:** Detailed insights into loan data. 
-
-- **Deposit Analysis:** Breakdown of deposit types and amounts. 
-
-- **Summary Dashboard:** A consolidated view of all KPIs. 
-
-## Conclusion
-
-Power BI dashboards are an effective tool for the banking industry. This project demonstrates how a banking operations dashboard can be developed using key metrics and KPIs to provide valuable insights. Banks can use this tool to easily see a client's total loan amount and other crucial information. It can also reveal which types of banks have the most clients and provide insights into which nationalities have the highest bank loans.
+The analysis is based on a Dataset that includes detailed information about bank accounts and clients, structured across multiple interconnected tables: ```Banking Relationship```, ```Client-Banking```, ```Gender```, ```Investment Advisor```, and ```Period```.
 
 
+## Data Cleaning and Calculated Functions
+The following transformations and calculations were applied to the raw data using **Power BI's DAX formulas**.
 
+### Column Creation
+These are the calculated columns created to clean and prepare the data.
+- **Engagement Timeframe**
+```
+Engagement Timeframe = 
+SWITCH(TRUE(),
+'Clients - Banking'[Engagment Days] < 365, "< 1 Years",
+'Clients - Banking'[Engagment Days] < 1825, "< 5 Years",
+'Clients - Banking'[Engagment Days] < 3650, "< 10 Years",
+'Clients - Banking'[Engagment Days] < 7300, "< 20 Years",
+"> 20 Years"
+)
+```
+- **Engagment Days**
+```
+Engagment Days = 
+DATEDIFF('Clients - Banking'[Joined Bank],TODAY(), DAY)
+```
+- **Income Band**
+```
+Income Band = 
+SWITCH(TRUE(),
+'Clients - Banking'[Estimated Income] < 100000, "Low",
+'Clients - Banking'[Estimated Income] < 300000, "Mid",
+"High"
+)
+```
+- **Processing Fees**
+```
+Processing Fees = 
+SWITCH('Clients - Banking'[Fee Structure],
+"High",0.05,
+"Mid",0.03,
+"Low",0.01,
+0
+)
+```
+### DAX Measures
+These are the DAX measures used to calculate the various KPIs.
+
+- **Total Clients**
+```
+Total Clients = DISTINCTCOUNT('Clients - Banking'[Client ID])
+```
+- **Total Loan**
+```
+Total Loan = SUM('Clients - Banking' [Bank Loan]) + SUM('Clients - Banking'[Business Lending]) +
+             SUM('Clients - Banking'[Credit Cards Balance])
+```
+- **Total Deposit**
+```
+Total Deposit = SUM('Clients - Banking'[Bank Deposit]) + SUM('Clients - Banking'[Savings Account]) +
+                SUM('Clients - Banking'[Foreign Currency Account]) + SUM('Clients - Banking'[Checking Accounts])
+```
+- **Total Fees**
+```
+Total Fees = SUMX('Clients - Banking' , [Total Loan] * 'Clients - Banking'[Processing Fees])
+```
+- **Total CC Amount**
+```
+Total CC Amount = SUM('Clients - Banking'[Amount of Credit Cards])
+```
+- **Engagement Length**
+```
+Engagment Length = SUM('Clients - Banking'[Engagment Days])
+```
+## Conclusion and Future Work
+Power BI dashboards are effective resources for the banking sector, empowering them with data visualization techniques and key performance metrics.
+
+These dashboards can help banks understand a particular investor's total loan amount and other details. Future applications include:
+
+- **Strategic Planning:** Identifying which types of banks have more clients (e.g., private banks) to help other banks develop strategies for client acquisition.
+
+
+- **Risk Assessment:** Gaining insights into which nationalities have the highest bank loans to inform risk models.
+
+
+- **Account Analysis:** Providing information on the various amounts in different types of accounts held by investors
 
 
 
